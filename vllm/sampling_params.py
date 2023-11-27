@@ -3,7 +3,7 @@ from enum import IntEnum
 from functools import cached_property
 from typing import List, Optional, Union
 
-_SAMPLING_EPS = 1e-5
+_SAMPLING_EPS = 3.0
 
 
 class SamplingType(IntEnum):
@@ -180,13 +180,19 @@ class SamplingParams:
                 "default value of 1.0 when not using beam search.")
 
     def _verify_greedy_sampling(self) -> None:
+        
         if self.best_of > 1:
             raise ValueError("best_of must be 1 when using greedy sampling."
                              f"Got {self.best_of}.")
-        if self.top_p < 1.0 - _SAMPLING_EPS:
-            raise ValueError("top_p must be 1 when using greedy sampling.")
-        if self.top_k != -1:
-            raise ValueError("top_k must be -1 when using greedy sampling.")
+        self.top_p = 1.0
+        self.top_k = -1
+        # if self.top_p < 1.0 - _SAMPLING_EPS:
+        # if self.top_p < 1.0:
+        #     raise ValueError("top_p must be 1 when using greedy sampling."
+        #                      f"Got {self.top_p}.")
+        # if self.top_k != -1:
+        #     raise ValueError("top_k must be -1 when using greedy sampling."
+        #                     f"Got {self.top_k}.")
 
     @cached_property
     def sampling_type(self) -> SamplingType:
